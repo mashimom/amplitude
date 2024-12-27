@@ -1,13 +1,13 @@
 package org.shimomoto.amplitude;
 
 import org.jetbrains.annotations.NotNull;
-import org.shimomoto.amplitude.api.ContinuousRange;
+import org.shimomoto.amplitude.api.Range;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
+class BaseRange<T extends Comparable<? super T>> implements Range<T> {
     protected final T min;
     protected final T max;
 
@@ -58,37 +58,37 @@ class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
     }
 
     @Override
-    public boolean isDisjoint(@NotNull ContinuousRange<T> range) {
+    public boolean isDisjoint(@NotNull Range<T> range) {
         return max.compareTo(range.getMin()) <= 0 || range.getMax().compareTo(min) <= 0;
     }
 
     @Override
-    public boolean isTouching(@NotNull ContinuousRange<T> range) {
+    public boolean isTouching(@NotNull Range<T> range) {
         return max.equals(range.getMin()) || range.getMax().equals(min);
     }
 
     @Override
-    public boolean isOverlapping(@NotNull ContinuousRange<T> range) {
+    public boolean isOverlapping(@NotNull Range<T> range) {
         return min.compareTo(range.getMax()) < 0 && range.getMin().compareTo(max) < 0;
     }
 
     @Override
-    public boolean isSubsetOrEqualTo(@NotNull ContinuousRange<T> range) {
+    public boolean isSubsetOrEqualTo(@NotNull Range<T> range) {
         return range.getMin().compareTo(min) <= 0 && max.compareTo(range.getMax()) <= 0;
     }
 
     @Override
-    public boolean isProperSubsetOf(@NotNull ContinuousRange<T> range) {
+    public boolean isProperSubsetOf(@NotNull Range<T> range) {
         return range.getMin().compareTo(min) < 0 && max.compareTo(range.getMax()) < 0;
     }
 
     @Override
-    public boolean isSuperSetOf(@NotNull ContinuousRange<T> range) {
+    public boolean isSuperSetOf(@NotNull Range<T> range) {
         return min.compareTo(range.getMin()) <= 0 && max.compareTo(range.getMax()) >= 0;
     }
 
     @Override
-    public List<ContinuousRange<T>> splitAt(@NotNull T limit) {
+    public List<Range<T>> splitAt(@NotNull T limit) {
         if (containsValue(limit)) {
             return List.of(new BaseRange<>(min, limit), new BaseRange<>(limit, max));
         }
@@ -96,7 +96,7 @@ class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
     }
 
     @Override
-    public List<ContinuousRange<T>> union(@NotNull ContinuousRange<T> other) {
+    public List<Range<T>> union(@NotNull Range<T> other) {
         if (this.equals(other)) {
             return List.of(this);
         }
@@ -107,7 +107,7 @@ class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
     }
 
     @Override
-    public Optional<ContinuousRange<T>> intersection(@NotNull ContinuousRange<T> other) {
+    public Optional<Range<T>> intersection(@NotNull Range<T> other) {
         if (this.isOverlapping(other)) {
             return Optional.of(new BaseRange<>(getMaxBetween(min, other.getMin()), getMinBetween(max, other.getMax())));
         }
@@ -115,7 +115,7 @@ class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
     }
 
     @Override
-    public List<ContinuousRange<T>> difference(@NotNull ContinuousRange<T> other) {
+    public List<Range<T>> difference(@NotNull Range<T> other) {
         if (this.isSubsetOrEqualTo(other)) {
             return List.of();
         } else if (this.isSuperSetOf(other)) {

@@ -11,22 +11,22 @@ import java.util.Optional;
  *
  * @param <T> A comparable type
  */
-public interface Range<T extends Comparable<? super T>, R extends Range<T, R>> {
+public interface Range<T extends Comparable<? super T>> {
     T getMin();
     T getMax();
 
     boolean isEmpty();
     boolean containsValue(@NotNull T value);
-    boolean isDisjoint(@NotNull R range);
-    boolean isTouching(@NotNull R range);
-    boolean isOverlapping(@NotNull R range);
-    boolean isSubsetOrEqualTo(@NotNull R range);
-    boolean isProperSubsetOf(@NotNull R range);
-    boolean isSuperSetOf(@NotNull R range);
+    boolean isDisjoint(@NotNull Range<T> range);
+    boolean isTouching(@NotNull Range<T> range);
+    boolean isOverlapping(@NotNull Range<T> range);
+    boolean isSubsetOrEqualTo(@NotNull Range<T> range);
+    boolean isProperSubsetOf(@NotNull Range<T> range);
+    boolean isSuperSetOf(@NotNull Range<T> range);
 
-    List<R> splitAt(@NotNull T limit);
+    List<Range<T>> splitAt(@NotNull T limit);
 
-    List<R> union(@NotNull R other);
-    Optional<R> intersection(@NotNull R other);
-    List<R> difference(@NotNull R other);
+    List<Range<T>> union(@NotNull Range<T> other);
+    Optional<Range<T>> intersection(@NotNull Range<T> other);
+    List<Range<T>> difference(@NotNull Range<T> other);
 }
