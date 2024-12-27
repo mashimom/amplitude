@@ -143,4 +143,24 @@ class IntegerRangePredicatesTest {
         assertFalse(range.isSuperSetOf(new IntegerRange(0, 4)));
         assertFalse(range.isSuperSetOf(new IntegerRange(-10, 10)));
     }
+
+    //    @Test
+//    void isSingletonRange_withSingleValue_accepts() {
+//        assertTrue(new IntegerRange(1, 2).isSingletonRange());
+//        assertEquals(1, IntStream.range(1, 2).count());
+//        assertTrue(new IntegerRange(-1, 0).isSingletonRange());
+//        assertEquals(1, IntStream.range(-1, 0).count());
+//        assertTrue(new IntegerRange(Integer.MIN_VALUE, Integer.MIN_VALUE+1).isSingletonRange());
+//        assertEquals(1, IntStream.range(Integer.MIN_VALUE, Integer.MIN_VALUE+1).count());
+//        assertTrue(new IntegerRange(Integer.MAX_VALUE-1, Integer.MAX_VALUE).isSingletonRange());
+//        assertEquals(1, IntStream.range(Integer.MAX_VALUE-1, Integer.MAX_VALUE).count());
+//    }
+//
+//    @Test
+//    void isSingletonRange_withoutSingleValue_refuses() {
+//        assertFalse(new IntegerRange(1, 3).isSingletonRange());
+//        assertFalse(new IntegerRange(-1, 1).isSingletonRange());
+//        assertFalse(new IntegerRange(Integer.MIN_VALUE, Integer.MIN_VALUE+2).isSingletonRange());
+//        assertFalse(new IntegerRange(Integer.MAX_VALUE-2, Integer.MAX_VALUE).isSingletonRange());
+//    }
 }

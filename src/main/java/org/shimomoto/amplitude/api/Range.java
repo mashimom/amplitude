@@ -1,5 +1,7 @@
 package org.shimomoto.amplitude.api;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -9,25 +11,22 @@ import java.util.Optional;
  *
  * @param <T> A comparable type
  */
-public interface Range<T extends Comparable<? super T>, R extends Range<T,? super R>> {
-    T min();
-    T max();
+public interface Range<T extends Comparable<? super T>, R extends Range<T, R>> {
+    T getMin();
+    T getMax();
+
     boolean isEmpty();
-    boolean containsValue(final T value);
-    boolean isDisjoint(R range);
-    boolean isTouching(R range);
-    boolean isOverlapping(R range);
-    boolean isSubsetOrEqualTo(R range);
-    boolean isProperSubsetOf(R range);
-    boolean isSuperSetOf(R range);
-    @Deprecated
-    boolean contains(final R range);
-    @Deprecated
-    default boolean intersects(final R other) {
-        return isOverlapping(other);
-    }
-    List<R> splitAt(final T limit);
-    Optional<R> intersection(final R other);
-    List<R> union(final R other);
-    List<R> difference(final R other);
+    boolean containsValue(@NotNull T value);
+    boolean isDisjoint(@NotNull R range);
+    boolean isTouching(@NotNull R range);
+    boolean isOverlapping(@NotNull R range);
+    boolean isSubsetOrEqualTo(@NotNull R range);
+    boolean isProperSubsetOf(@NotNull R range);
+    boolean isSuperSetOf(@NotNull R range);
+
+    List<R> splitAt(@NotNull T limit);
+
+    List<R> union(@NotNull R other);
+    Optional<R> intersection(@NotNull R other);
+    List<R> difference(@NotNull R other);
 }

@@ -20,8 +20,8 @@ class IntegerRangeConstructorsTest {
         IntegerRange range = new IntegerRange(a, b);
         Optional<IntegerRange> same = IntegerRange.create(a,b);
 
-        assertEquals(a, range.min());
-        assertEquals(b, range.max());
+        assertEquals(a, range.getMin());
+        assertEquals(b, range.getMax());
         assertTrue(same.isPresent());
         assertEquals(range, same.get());
     }
@@ -55,7 +55,7 @@ class IntegerRangeConstructorsTest {
     }
 
     @Test
-    void create_fromMaxToMin_isEmpty() {
+    void create_fromGetMaxToGetMin_isEmpty() {
         assertEquals(Optional.empty(), IntegerRange.create(2, 1));
         assertEquals(Optional.empty(), IntegerRange.create(-1, -10));
     }
