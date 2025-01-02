@@ -1,0 +1,99 @@
+plugins {
+    id 'com.github.ben-manes.versions' version '0.51.0'
+    id 'groovy'
+    id 'idea'
+    id 'jacoco'
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.ajoberstar.grgit' version '5.0.0-rc.3'
+    id 'project-report'
+}
+defaultTasks 'clean', 'assemble', 'projectReport', 'jar', 'check'
+
+group = 'org.shimomoto'
+//noinspection UnnecessaryQualifiedReference
+version = org.ajoberstar.grgit.Grgit.open(dir: project.rootDir).describe(tags: true).replaceFirst('v', '')
+description = 'A ranges library'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+        targetCompatibility = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor 'org.jetbrains:annotations:26.0.1'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    compileOnly 'org.jetbrains:annotations:26.0.1'
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation 'ch.qos.logback:logback-classic:1.5.12'
+
+    testImplementation 'org.apache.groovy:groovy-all:4.0.24'
+    testImplementation platform('org.spockframework:spock-bom:2.3-groovy-4.0')
+    testImplementation 'org.spockframework:spock-core'
+    testImplementation 'org.spockframework:spock-junit4'
+    testImplementation('com.athaydes:spock-reports:2.5.1-groovy-4.0') {
+        transitive = false
+    }
+//    testImplementation 'com.codepoetics:protonpack:1.16'
+
+    testRuntimeOnly 'net.bytebuddy:byte-buddy:1.15.11'
+    testRuntimeOnly 'org.objenesis:objenesis:3.4'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+//        events 'passed', 'skipped', 'failed'
+        events 'failed'
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+}
+
+javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+
+def isNonStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+(-r)?$/
+    return !stableKeyword && !(version ==~ regex)
+}
+
+tasks.named("dependencyUpdates").configure {
+    rejectVersionIf {
+        isNonStable(it.candidate.version)
+    }
+
+    rejectVersionIf {
+        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+    }
+
+    resolutionStrategy {
+        componentSelection {
+            configureEach {
+                if (isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)) {
+                    reject('Release candidate')
+                }
+            }
+        }
+    }
+}
+

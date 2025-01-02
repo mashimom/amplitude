@@ -1,0 +1,65 @@
+name: Java CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache Gradle wrapper
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.gradle/notifications
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Generating output files with Gradle
+        run: ./gradlew assemble jar projectReport -Dorg.gradle.unsafe.configuration-cache=false -Dorg.gradle.daemon=false
+
+      - name: Running all checks
+        run: ./gradlew check -Dorg.gradle.unsafe.configuration-cache=false -Dorg.gradle.daemon=false
+
+      - name: Zip test reports
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          base_name=$(basename build/libs/*.jar .jar)
+          zip -r build/libs/${base_name}.zip build/reports/tests/test
+
+      - name: Archive build artifacts
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            build/libs/*.jar
+            build/libs/*.zip
