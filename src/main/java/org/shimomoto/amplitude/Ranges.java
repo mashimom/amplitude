@@ -16,6 +16,6 @@ public final class Ranges {
         return new BaseRange<>(min, max);
     }
     public static <T extends Temporal & Comparable<T>> ChronoRange<T> chronoRange(T min, T max, TemporalUnit unit, long step) {
-        return new BaseChronoRange<>(min, max, unit, step);
+        return new ChronoRangeDecorator<>(new BaseRange<>(min, max), unit, step);
     }
 }

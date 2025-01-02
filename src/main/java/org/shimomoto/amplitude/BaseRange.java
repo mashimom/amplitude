@@ -1,5 +1,9 @@
 package org.shimomoto.amplitude;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.shimomoto.amplitude.api.Range;
 
@@ -7,6 +11,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@EqualsAndHashCode
+@Getter
 class BaseRange<T extends Comparable<? super T>> implements Range<T> {
     protected final T min;
     protected final T max;
@@ -126,18 +132,6 @@ class BaseRange<T extends Comparable<? super T>> implements Range<T> {
             return List.of(new BaseRange<>(other.getMax(), max));
         }
         return List.of(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        BaseRange<?> baseRange = (BaseRange<?>) o;
-        return Objects.equals(min, baseRange.min) && Objects.equals(max, baseRange.max);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(min, max);
     }
 
     @Override
