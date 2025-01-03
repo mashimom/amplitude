@@ -1,32 +1,16 @@
 package org.shimomoto.amplitude;
 
 import org.jetbrains.annotations.NotNull;
-import org.shimomoto.amplitude.api.ContinuousRange;
+import org.shimomoto.amplitude.api.Range;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
-    protected final T min;
-    protected final T max;
-
-    BaseRange(T min, T max) {
+record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range<T> {
+    BaseRange {
         if (min.compareTo(max) > 0) {
             throw new IllegalArgumentException("Inverted range is not accepted: min: " + min + ", max: " + max);
         }
-        this.min = min;
-        this.max = max;
-    }
-
-    @Override
-    public T getMin() {
-        return min;
-    }
-
-    @Override
-    public T getMax() {
-        return max;
     }
 
     /**
@@ -58,37 +42,37 @@ class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
     }
 
     @Override
-    public boolean isDisjoint(@NotNull ContinuousRange<T> range) {
-        return max.compareTo(range.getMin()) <= 0 || range.getMax().compareTo(min) <= 0;
+    public boolean isDisjoint(@NotNull Range<T> range) {
+        return max.compareTo(range.min()) <= 0 || range.max().compareTo(min) <= 0;
     }
 
     @Override
-    public boolean isTouching(@NotNull ContinuousRange<T> range) {
-        return max.equals(range.getMin()) || range.getMax().equals(min);
+    public boolean isTouching(@NotNull Range<T> range) {
+        return max.equals(range.min()) || range.max().equals(min);
     }
 
     @Override
-    public boolean isOverlapping(@NotNull ContinuousRange<T> range) {
-        return min.compareTo(range.getMax()) < 0 && range.getMin().compareTo(max) < 0;
+    public boolean isOverlapping(@NotNull Range<T> range) {
+        return min.compareTo(range.max()) < 0 && range.min().compareTo(max) < 0;
     }
 
     @Override
-    public boolean isSubsetOrEqualTo(@NotNull ContinuousRange<T> range) {
-        return range.getMin().compareTo(min) <= 0 && max.compareTo(range.getMax()) <= 0;
+    public boolean isSubsetOrEqualTo(@NotNull Range<T> range) {
+        return range.min().compareTo(min) <= 0 && max.compareTo(range.max()) <= 0;
     }
 
     @Override
-    public boolean isProperSubsetOf(@NotNull ContinuousRange<T> range) {
-        return range.getMin().compareTo(min) < 0 && max.compareTo(range.getMax()) < 0;
+    public boolean isProperSubsetOf(@NotNull Range<T> range) {
+        return range.min().compareTo(min) < 0 && max.compareTo(range.max()) < 0;
     }
 
     @Override
-    public boolean isSuperSetOf(@NotNull ContinuousRange<T> range) {
-        return min.compareTo(range.getMin()) <= 0 && max.compareTo(range.getMax()) >= 0;
+    public boolean isSuperSetOf(@NotNull Range<T> range) {
+        return min.compareTo(range.min()) <= 0 && max.compareTo(range.max()) >= 0;
     }
 
     @Override
-    public List<ContinuousRange<T>> splitAt(@NotNull T limit) {
+    public List<Range<T>> splitAt(@NotNull T limit) {
         if (containsValue(limit)) {
             return List.of(new BaseRange<>(min, limit), new BaseRange<>(limit, max));
         }
@@ -96,52 +80,49 @@ class BaseRange<T extends Comparable<T>> implements ContinuousRange<T> {
     }
 
     @Override
-    public List<ContinuousRange<T>> union(@NotNull ContinuousRange<T> other) {
+    public List<Range<T>> union(@NotNull Range<T> other) {
         if (this.equals(other)) {
             return List.of(this);
         }
         if (this.isOverlapping(other) || this.isTouching(other)) {
-            return List.of(new BaseRange<>(getMinBetween(min, other.getMin()), getMaxBetween(max, other.getMax())));
+            return List.of(new BaseRange<>(getMinBetween(min, other.min()), getMaxBetween(max, other.max())));
         }
         return List.of(this, other);
     }
 
     @Override
-    public Optional<ContinuousRange<T>> intersection(@NotNull ContinuousRange<T> other) {
+    public Optional<Range<T>> intersection(@NotNull Range<T> other) {
         if (this.isOverlapping(other)) {
-            return Optional.of(new BaseRange<>(getMaxBetween(min, other.getMin()), getMinBetween(max, other.getMax())));
+            return Optional.of(new BaseRange<>(getMaxBetween(min, other.min()), getMinBetween(max, other.max())));
         }
         return Optional.empty();
     }
 
     @Override
-    public List<ContinuousRange<T>> difference(@NotNull ContinuousRange<T> other) {
+    public List<Range<T>> difference(@NotNull Range<T> other) {
         if (this.isSubsetOrEqualTo(other)) {
             return List.of();
         } else if (this.isSuperSetOf(other)) {
-            return List.of(new BaseRange<>(min, other.getMin()), new BaseRange<>(other.getMax(), max));
-        } else if (this.containsValue(other.getMin())) {
-            return List.of(new BaseRange<>(min, other.getMin()));
-        } else if (this.containsValue(other.getMax())) {
-            return List.of(new BaseRange<>(other.getMax(), max));
+            return List.of(new BaseRange<>(min, other.min()), new BaseRange<>(other.max(), max));
+        } else if (this.containsValue(other.min())) {
+            return List.of(new BaseRange<>(min, other.min()));
+        } else if (this.containsValue(other.max())) {
+            return List.of(new BaseRange<>(other.max(), max));
         }
         return List.of(this);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        BaseRange<?> baseRange = (BaseRange<?>) o;
-        return Objects.equals(min, baseRange.min) && Objects.equals(max, baseRange.max);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(min, max);
-    }
-
-    @Override
     public String toString() {
         return "[" + min.toString() + ", " + max.toString() + ")";
+    }
+
+    @Override
+    public int compareTo(Range<T> other) {
+        int minComparison = this.min.compareTo(other.min());
+        if (minComparison != 0) {
+            return minComparison;
+        }
+        return this.max.compareTo(other.max());
     }
 }

@@ -1,13 +1,13 @@
 package org.shimomoto.amplitude
 
-import org.shimomoto.amplitude.api.ContinuousRange
+import org.shimomoto.amplitude.api.Range
 import spock.lang.Specification
 
 class BaseRangeSpec extends Specification {
 
 	def "split_At_withContainedLimit_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.splitAt(2) == [Ranges.of(1, 2), Ranges.of(2, 3)]
@@ -15,7 +15,7 @@ class BaseRangeSpec extends Specification {
 
 	def "split_At_withoutContainedLimit_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.splitAt(0) == [Ranges.of(1, 3)]
@@ -24,7 +24,7 @@ class BaseRangeSpec extends Specification {
 
 	def "union_equal_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.union(base) == [base]
@@ -32,7 +32,7 @@ class BaseRangeSpec extends Specification {
 
 	def "union_touching_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.union(Ranges.of(3, 4)) == [Ranges.of(1, 4)]
@@ -43,7 +43,7 @@ class BaseRangeSpec extends Specification {
 
 	def "union_overlapping_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.union(Ranges.of(2, 10)) == [Ranges.of(1, 10)]
@@ -54,7 +54,7 @@ class BaseRangeSpec extends Specification {
 
 	def "union_disjoint_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.union(Ranges.of(4, 5)) == [Ranges.of(1, 3), Ranges.of(4, 5)]
@@ -63,7 +63,7 @@ class BaseRangeSpec extends Specification {
 
 	def "intersection_disjoint_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.intersection(Ranges.of(3, 4)).isEmpty()
@@ -72,7 +72,7 @@ class BaseRangeSpec extends Specification {
 
 	def "intersection_overlapping_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 4)
+			Range<Integer> base = Ranges.of(1, 4)
 
 		expect:
 			base.intersection(Ranges.of(2, 5)) == Optional.of(Ranges.of(2, 4))
@@ -85,7 +85,7 @@ class BaseRangeSpec extends Specification {
 
 	def "difference_disjoint_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.difference(Ranges.of(3, 4)) == [base]
@@ -94,7 +94,7 @@ class BaseRangeSpec extends Specification {
 
 	def "difference_subsetOrEqual_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.difference(Ranges.of(0, 4)).isEmpty()
@@ -105,8 +105,8 @@ class BaseRangeSpec extends Specification {
 
 	def "difference_superset_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
-			ContinuousRange<Integer> largerRange = Ranges.of(-10, 10)
+			Range<Integer> base = Ranges.of(1, 3)
+			Range<Integer> largerRange = Ranges.of(-10, 10)
 
 		expect:
 			base.difference(Ranges.of(2, 2)) == [Ranges.of(1, 2), Ranges.of(2, 3)]
@@ -125,7 +125,7 @@ class BaseRangeSpec extends Specification {
 
 	def "difference_rightOverlap_works"() {
 		given:
-			ContinuousRange<Integer> base = Ranges.of(1, 3)
+			Range<Integer> base = Ranges.of(1, 3)
 
 		expect:
 			base.difference(Ranges.of(2, 4)) == [Ranges.of(1, 2)]
