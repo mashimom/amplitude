@@ -11,9 +11,10 @@ import java.util.Optional;
  *
  * @param <T> A comparable type
  */
-public interface Range<T extends Comparable<? super T>> {
-    T getMin();
-    T getMax();
+public interface Range<T extends Comparable<? super T>> extends Comparable<Range<T>> {
+    T min();
+
+    T max();
 
     boolean isEmpty();
     boolean containsValue(@NotNull T value);
