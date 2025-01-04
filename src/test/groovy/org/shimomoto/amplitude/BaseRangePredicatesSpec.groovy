@@ -102,22 +102,25 @@ class BaseRangePredicatesSpec extends Specification {
 
 	def "test isProperSubsetOf"() {
 		given:
-			Range<Integer> range1 = Ranges.of(1, 5)
-			Range<Integer> range2 = Ranges.of(5, 10)
-			Range<Integer> subset1a = Ranges.of(2, 4)
-			Range<Integer> subset1b = Ranges.of(1, 4)
-			Range<Integer> subset2a = Ranges.of(6, 9)
-			Range<Integer> subset2b = Ranges.of(6, 10)
+			Range<Integer> range_1_5 = Ranges.of(1, 5)
+			Range<Integer> range_5_10 = Ranges.of(5, 10)
+			Range<Integer> subset_2_4 = Ranges.of(2, 4)
+			Range<Integer> subset_1_4 = Ranges.of(1, 4)
+			Range<Integer> subset_6_9 = Ranges.of(6, 9)
+			Range<Integer> subset_6_10 = Ranges.of(6, 10)
 
 		expect:
-			!range1.isProperSubsetOf(range2)
-			!range2.isProperSubsetOf(range1)
-			!range1.isProperSubsetOf(range1)
-			!range2.isProperSubsetOf(range2)
-			!subset1b.isProperSubsetOf(range1)
-			!subset2b.isProperSubsetOf(range2)
-			subset1a.isProperSubsetOf(range1)
-			subset2a.isProperSubsetOf(range2)
+			!range_1_5.isProperSubsetOf(range_5_10)
+			!range_5_10.isProperSubsetOf(range_1_5)
+			!range_1_5.isProperSubsetOf(range_1_5)
+			!range_5_10.isProperSubsetOf(range_5_10)
+		and:
+			Ranges.of(1, 3).isProperSubsetOf(Ranges.of(0, 3))
+			Ranges.of(1, 3).isProperSubsetOf(Ranges.of(1, 4))
+			subset_1_4.isProperSubsetOf(range_1_5)
+			subset_2_4.isProperSubsetOf(range_1_5)
+			subset_6_9.isProperSubsetOf(range_5_10)
+			subset_6_10.isProperSubsetOf(range_5_10)
 	}
 
 	def "test isSuperSetOf"() {

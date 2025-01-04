@@ -1,6 +1,7 @@
 package org.shimomoto.amplitude;
 
 import lombok.experimental.Delegate;
+import org.jetbrains.annotations.NotNull;
 import org.shimomoto.amplitude.api.Range;
 import org.shimomoto.amplitude.api.TemporalRange;
 
@@ -18,27 +19,31 @@ record TemporalRangeDecorator<T extends Temporal & Comparable<? super T>>(
     @Override
     public Stream<TemporalRange<T>> split() {
         long total = min().until(max(), unit);
+        var sameSizeSplit = getUniformSplits(total);
+        if (total % step == 0) {
+            return sameSizeSplit;
+        }
 
+        return Stream.concat(sameSizeSplit, getRemainderSplit(total));
+    }
+
+    private @NotNull Stream<TemporalRange<T>> getRemainderSplit(long total) {
         //noinspection unchecked
-        var sameSizeSplit = LongStream.iterate(0, l -> l + step)
-                .limit(total / step)
+        return Stream.of(Ranges.temporalRange(
+                (T) max().minus(total % step, unit),
+                max(),
+                unit,
+                step
+        ));
+    }
+
+    private @NotNull Stream<TemporalRange<T>> getUniformSplits(long total) {
+        //noinspection unchecked
+        return LongStream.range(0, total / step)
                 .mapToObj(l -> Ranges.temporalRange(
-                        (T) min().plus(l, unit),
-                        (T) min().plus(l + step, unit),
+                        (T) min().plus(l * step, unit),
+                        (T) min().plus((l + 1) * step, unit),
                         unit,
                         step));
-
-        if (total % step != 0) {
-            //noinspection unchecked
-            return Stream.concat(
-                    sameSizeSplit,
-                    Stream.of(Ranges.temporalRange(
-                            (T) max().minus(total % step, unit),
-                            max(),
-                            unit,
-                            step
-                    )));
-        }
-        return sameSizeSplit;
     }
 }
