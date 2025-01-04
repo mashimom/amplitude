@@ -4,7 +4,6 @@ plugins {
     id 'idea'
     id 'jacoco'
     id 'java-library'
-    id 'maven-publish'
     id 'org.ajoberstar.grgit' version '5.0.0-rc.3'
     id 'project-report'
 }
@@ -20,6 +19,7 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
         targetCompatibility = JavaLanguageVersion.of(21)
     }
+    withJavadocJar()
 }
 
 repositories {
@@ -33,7 +33,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.36'
 
     implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation 'ch.qos.logback:logback-classic:1.5.12'
+    implementation 'ch.qos.logback:logback-classic:1.5.15'
 
     testImplementation 'org.apache.groovy:groovy-all:4.0.24'
     testImplementation platform('org.spockframework:spock-bom:2.3-groovy-4.0')
@@ -48,20 +48,13 @@ dependencies {
     testRuntimeOnly 'org.objenesis:objenesis:3.4'
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
-
 test {
     useJUnitPlatform()
     testLogging {
 //        events 'passed', 'skipped', 'failed'
         events 'failed'
     }
+    //noinspection GrDeprecatedAPIUsage
     outputs.dir "$buildDir/spock-reports"
     finalizedBy jacocoTestReport
 }
@@ -69,8 +62,6 @@ test {
 jacocoTestReport {
     dependsOn test
 }
-
-javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 
 def isNonStable = { String version ->
     def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
@@ -98,3 +89,11 @@ tasks.named("dependencyUpdates").configure {
     }
 }
 
+tasks.javadoc {
+    options {
+        addStringOption('Xdoclint:none', '-quiet')
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        links 'https://docs.oracle.com/en/java/javase/21/docs/api/'
+    }
+}

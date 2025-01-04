@@ -18,7 +18,7 @@ class TemporalDemoSpec extends Specification {
 	def "A basic usage with LocalDate"() {
 		given: "A TemporalRange with LocalDate and ChronoUnit.DAYS"
 			@Subject
-			TemporalRange<LocalDate> range = Ranges.chronoRange(
+			TemporalRange<LocalDate> range = Ranges.temporalRange(
 					LocalDate.of(2025, 1, 1),
 					LocalDate.of(2025, 1, 4),
 					ChronoUnit.DAYS,
@@ -46,7 +46,7 @@ class TemporalDemoSpec extends Specification {
 	def "An advanced usage with LocalDateTime"() {
 		given: "A TemporalRange with LocalDateTime and ChronoUnit.HOURS"
 			@Subject
-			TemporalRange<LocalDateTime> range = Ranges.chronoRange(
+			TemporalRange<LocalDateTime> range = Ranges.temporalRange(
 					LocalDateTime.of(2025, 1, 1, 0, 0),
 					LocalDateTime.of(2025, 1, 1, 14, 0),
 					ChronoUnit.HOURS,
@@ -67,8 +67,9 @@ class TemporalDemoSpec extends Specification {
 
 	def "But if the TemporalUnit provided is a fraction of the Temporal"() {
 		when: "Creating a TemporalRange with LocalDate and ChronoUnit.HOURS"
+			//noinspection GroovyUnusedAssignment
 			@Subject
-			TemporalRange<LocalDate> invalidRangeUnit = Ranges.chronoRange(
+			TemporalRange<LocalDate> invalidRangeUnit = Ranges.temporalRange(
 					LocalDate.of(2025, 1, 1),
 					LocalDate.of(2025, 1, 10),
 					ChronoUnit.HOURS, // Unit smaller than a day
@@ -81,15 +82,15 @@ class TemporalDemoSpec extends Specification {
 	}
 
 	def "Union of 2 ranges on LocalDateTime"() {
-		given: "Two overlapping ChronoRanges with LocalDateTime"
+		given: "Two overlapping TemporalRanges with LocalDateTime"
 			@Subject
-			TemporalRange<LocalDateTime> range1 = Ranges.chronoRange(
+			TemporalRange<LocalDateTime> range1 = Ranges.temporalRange(
 					LocalDateTime.of(2025, 1, 1, 0, 0),
 					LocalDateTime.of(2025, 1, 1, 6, 0),
 					ChronoUnit.HOURS,
 					1L
 			)
-			TemporalRange<LocalDateTime> range2 = Ranges.chronoRange(
+			TemporalRange<LocalDateTime> range2 = Ranges.temporalRange(
 					LocalDateTime.of(2025, 1, 1, 3, 0),
 					LocalDateTime.of(2025, 1, 1, 9, 0),
 					ChronoUnit.HOURS,

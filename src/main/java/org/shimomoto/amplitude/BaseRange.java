@@ -9,7 +9,7 @@ import java.util.Optional;
 record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range<T> {
     BaseRange {
         if (min.compareTo(max) > 0) {
-            throw new IllegalArgumentException("Inverted range is not accepted: min: " + min + ", max: " + max);
+            throw new IllegalArgumentException(String.format("Inverted range is not accepted: min: %s, max: %s", min, max));
         }
     }
 
@@ -63,7 +63,8 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
 
     @Override
     public boolean isProperSubsetOf(@NotNull Range<T> range) {
-        return range.min().compareTo(min) < 0 && max.compareTo(range.max()) < 0;
+        return range.min().compareTo(min) < 0 && max.compareTo(range.max()) <= 0
+                || range.min().compareTo(min) <= 0 && max.compareTo(range.max()) < 0;
     }
 
     @Override
@@ -100,7 +101,7 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
 
     @Override
     public List<Range<T>> difference(@NotNull Range<T> other) {
-        if (this.isSubsetOrEqualTo(other)) {
+        if (this.equals(other) || other.isSuperSetOf(this)) {
             return List.of();
         } else if (this.isSuperSetOf(other)) {
             return List.of(new BaseRange<>(min, other.min()), new BaseRange<>(other.max(), max));
