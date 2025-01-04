@@ -19,18 +19,20 @@ record TemporalRangeDecorator<T extends Temporal & Comparable<? super T>>(
     public Stream<TemporalRange<T>> split() {
         long total = min().until(max(), unit);
 
+        //noinspection unchecked
         var sameSizeSplit = LongStream.iterate(0, l -> l + step)
                 .limit(total / step)
-                .mapToObj(l -> Ranges.chronoRange(
+                .mapToObj(l -> Ranges.temporalRange(
                         (T) min().plus(l, unit),
                         (T) min().plus(l + step, unit),
                         unit,
                         step));
 
         if (total % step != 0) {
+            //noinspection unchecked
             return Stream.concat(
                     sameSizeSplit,
-                    Stream.of(Ranges.chronoRange(
+                    Stream.of(Ranges.temporalRange(
                             (T) max().minus(total % step, unit),
                             max(),
                             unit,

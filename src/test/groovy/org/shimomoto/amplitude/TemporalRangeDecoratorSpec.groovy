@@ -16,10 +16,10 @@ class TemporalRangeDecoratorSpec extends Specification {
 			def start = LocalDateTime.of(2025, 1, 3, 0, 0, 0)
 			def end = LocalDateTime.of(2025, 1, 3, 12, 0, 0)
 			@Subject
-			TemporalRange<LocalDateTime> range = Ranges.chronoRange(start, end, ChronoUnit.HOURS, 4L)
+			TemporalRange<LocalDateTime> range = Ranges.temporalRange(start, end, ChronoUnit.HOURS, 4L)
 			var splitRanges = (0..12).step(4).collate(2, 1, false)
 					.collect { l, r ->
-						Ranges.chronoRange(
+						Ranges.temporalRange(
 								start.plus(l as long, ChronoUnit.HOURS),
 								start.plus(r as long, ChronoUnit.HOURS),
 								ChronoUnit.HOURS,
@@ -34,16 +34,16 @@ class TemporalRangeDecoratorSpec extends Specification {
 			def start = LocalDateTime.of(2025, 1, 3, 0, 0, 0)
 			def end = LocalDateTime.of(2025, 1, 3, 14, 0, 0)
 			@Subject
-			TemporalRange<LocalDateTime> range = Ranges.chronoRange(start, end, ChronoUnit.HOURS, 4L)
+			TemporalRange<LocalDateTime> range = Ranges.temporalRange(start, end, ChronoUnit.HOURS, 4L)
 			var splitRanges = (0..12).step(4).collate(2, 1, false)
 					.collect { l, r ->
-						Ranges.chronoRange(
+						Ranges.temporalRange(
 								start.plus(l as long, ChronoUnit.HOURS),
 								start.plus(r as long, ChronoUnit.HOURS),
 								ChronoUnit.HOURS,
 								4L)
 					}
-			def extraSplit = Ranges.chronoRange(
+			def extraSplit = Ranges.temporalRange(
 					start.plus(12L, ChronoUnit.HOURS),
 					start.plus(14L, ChronoUnit.HOURS),
 					ChronoUnit.HOURS,
@@ -55,8 +55,9 @@ class TemporalRangeDecoratorSpec extends Specification {
 
 	def "splitting on fails if the unit would change the Temporal type"() {
 		when:
+			//noinspection GroovyUnusedAssignment
 			@Subject
-			TemporalRange<LocalDate> invalidRangeUnit = Ranges.chronoRange(
+			TemporalRange<LocalDate> invalidRangeUnit = Ranges.temporalRange(
 					LocalDate.of(2025, 1, 1),
 					LocalDate.of(2025, 1, 10),
 					ChronoUnit.HOURS, // Unit smaller than a day
