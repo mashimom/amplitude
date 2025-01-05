@@ -1,12 +1,16 @@
+//file:noinspection SpellCheckingInspection
 plugins {
-    id 'com.github.ben-manes.versions' version '0.51.0'
-    id 'groovy'
-    id 'idea'
-    id 'jacoco'
-    id 'java-library'
-    id 'org.ajoberstar.grgit' version '5.0.0-rc.3'
-    id 'org.owasp.dependencycheck' version '11.1.1'
-    id 'project-report'
+	id 'com.github.ben-manes.versions' version '0.51.0'
+	id 'groovy'
+	id 'idea'
+	id 'jacoco'
+	id 'java-library'
+	id 'maven-publish'
+	id 'org.ajoberstar.grgit' version '5.0.0-rc.3'
+	id 'org.owasp.dependencycheck' version '11.1.1'
+	id 'pmd'
+	id 'project-report'
+	id 'signing'
 }
 defaultTasks 'clean', 'assemble', 'projectReport', 'jar', 'check'
 
@@ -16,100 +20,174 @@ version = org.ajoberstar.grgit.Grgit.open(dir: project.rootDir).describe(tags: t
 description = 'A ranges library'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-        targetCompatibility = JavaLanguageVersion.of(21)
-    }
-    withJavadocJar()
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+		targetCompatibility = JavaLanguageVersion.of(17)
+	}
+	withJavadocJar()
 }
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    annotationProcessor 'org.jetbrains:annotations:26.0.1'
-    annotationProcessor 'org.projectlombok:lombok:1.18.36'
-    compileOnly 'org.jetbrains:annotations:26.0.1'
-    compileOnly 'org.projectlombok:lombok:1.18.36'
+	annotationProcessor 'org.jetbrains:annotations:26.0.1'
+	annotationProcessor 'org.projectlombok:lombok:1.18.36'
+	compileOnly 'org.jetbrains:annotations:26.0.1'
+	compileOnly 'org.projectlombok:lombok:1.18.36'
 
-    implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation 'ch.qos.logback:logback-classic:1.5.15'
+	implementation 'org.slf4j:slf4j-api:2.0.9'
+	implementation 'ch.qos.logback:logback-classic:1.5.15'
 
-    testImplementation 'org.apache.groovy:groovy-all:4.0.24'
-    testImplementation platform('org.spockframework:spock-bom:2.3-groovy-4.0')
-    testImplementation 'org.spockframework:spock-core'
-    testImplementation 'org.spockframework:spock-junit4'
-    testImplementation('com.athaydes:spock-reports:2.5.1-groovy-4.0') {
-        transitive = false
-    }
-//    testImplementation 'com.codepoetics:protonpack:1.16'
+	testImplementation 'org.apache.groovy:groovy-all:4.0.24'
+	testImplementation platform('org.spockframework:spock-bom:2.3-groovy-4.0')
+	testImplementation 'org.spockframework:spock-core'
+	testImplementation 'org.spockframework:spock-junit4'
+	testImplementation('com.athaydes:spock-reports:2.5.1-groovy-4.0') {
+		transitive = false
+	}
 
-    testRuntimeOnly 'net.bytebuddy:byte-buddy:1.15.11'
-    testRuntimeOnly 'org.objenesis:objenesis:3.4'
+	testRuntimeOnly 'net.bytebuddy:byte-buddy:1.15.11'
+	testRuntimeOnly 'org.objenesis:objenesis:3.4'
 }
 
 test {
-    useJUnitPlatform()
-    testLogging {
+	useJUnitPlatform()
+	testLogging {
 //        events 'passed', 'skipped', 'failed'
-        events 'failed'
-    }
-    //noinspection GrDeprecatedAPIUsage
-    outputs.dir "$buildDir/spock-reports"
-    finalizedBy jacocoTestReport
+		events 'failed'
+	}
+	//noinspection GrDeprecatedAPIUsage
+	outputs.dir "$buildDir/spock-reports"
+	finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
-    dependsOn test
+	dependsOn test
 }
 
+tasks.jacocoTestCoverageVerification {
+	dependsOn(jacocoTestReport)
+	violationRules {
+		rule {
+			limit {
+				minimum = "0.92".toBigDecimal()
+			}
+		}
+	}
+}
+
+
 def isNonStable = { String version ->
-    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
-    def regex = /^[0-9,.v-]+(-r)?$/
-    return !stableKeyword && !(version ==~ regex)
+	def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+	def regex = /^[0-9,.v-]+(-r)?$/
+	return !stableKeyword && !(version ==~ regex)
 }
 
 tasks.named("dependencyUpdates").configure {
-    rejectVersionIf {
-        isNonStable(it.candidate.version)
-    }
+	rejectVersionIf {
+		isNonStable(it.candidate.version)
+	}
 
-    rejectVersionIf {
-        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
-    }
+	rejectVersionIf {
+		isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+	}
 
-    resolutionStrategy {
-        componentSelection {
-            configureEach {
-                if (isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)) {
-                    reject('Release candidate')
-                }
-            }
-        }
-    }
+	resolutionStrategy {
+		componentSelection {
+			configureEach {
+				if (isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)) {
+					reject('Release candidate')
+				}
+			}
+		}
+	}
 }
 
 tasks.javadoc {
-    options {
-        addStringOption('Xdoclint:none', '-quiet')
-        encoding = 'UTF-8'
-        charSet = 'UTF-8'
-        links 'https://docs.oracle.com/en/java/javase/21/docs/api/'
-    }
+	options {
+		addStringOption('Xdoclint:none', '-quiet')
+		encoding = 'UTF-8'
+		charSet = 'UTF-8'
+		links 'https://docs.oracle.com/en/java/javase/21/docs/api/'
+	}
 }
 
 dependencyCheck {
-    analyzers {
-        nvd {
-            apiKey = project.hasProperty('nvdApiKey') ? project.nvdApiKey : System.getenv('NVD_API_KEY')
-        }
-    }
+	analyzers {
+		nvd {
+			apiKey = project.hasProperty('nvdApiKey') ? project.nvdApiKey : System.getenv('NVD_API_KEY')
+		}
+	}
 
-    // Optional: Configure other settings
-    failBuildOnCVSS = 7  // Optional: Fail build if any CVE has a CVSS score greater than or equal to 7
+	// Optional: Configure other settings
+	failBuildOnCVSS = 7  // Optional: Fail build if any CVE has a CVSS score greater than or equal to 7
 //    suppressionFile = 'dependency-check-suppression.xml'  // Optional: Suppression file for known issues
 //    formats = ['HTML', 'XML', 'JSON']  // Output formats
 //    outputDirectory = 'build/reports/dependency-check'  // Location to save reports
 
+}
+
+pmd {
+	consoleOutput = true
+	toolVersion = '7.9.0'
+	ruleSets = []
+	ruleSetFiles = files('pmd_ruleset.xml')
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+
+			pom {
+				name = 'amplitude'
+				description = 'A ranges library'
+				url = 'https://github.com/mashimom/amplitude'
+
+				licenses {
+					license {
+						name = 'MIT License'
+						url = 'https://opensource.org/licenses/MIT'
+					}
+				}
+				developers {
+					developer {
+						id = 'mashimom'
+						name = 'Marco Shimomoto'
+						email = 'mashimom@gmail.com'
+					}
+				}
+				scm {
+					connection = 'scm:git:git://github.com/mashimom/amplitude.git'
+					developerConnection = 'scm:git:ssh://github.com/mashimom/amplitude.git'
+					url = 'https://github.com/mashimom/amplitude'
+				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			name = 'MavenCentral'
+			url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+			credentials {
+				username = project.findProperty('ossrhUsername') ?: System.getenv('OSSRH_USERNAME')
+				password = project.findProperty('ossrhPassword') ?: System.getenv('OSSRH_PASSWORD')
+			}
+		}
+	}
+}
+
+signing {
+	if (System.getenv('CI')) {
+		// Use in-memory PGP keys in the pipeline
+		def secretKey = System.getenv('GPG_PRIVATE_KEY')
+		def password = System.getenv('GPG_PRIVATE_KEY_PASSPHRASE')
+		useInMemoryPgpKeys(secretKey, password)
+	} else {
+		// Use GPG command locally
+		useGpgCmd()
+	}
+	sign publishing.publications.mavenJava
 }
