@@ -10,20 +10,19 @@ import java.util.stream.Stream;
  * It includes methods for splitting the temporal range into smaller temporal ranges.
  * </p>
  * <p>
- * Example usage:
- * {@snippet :
- *     TemporalRange<LocalDate> dateRange = Ranges.temporalRange(LocalDate.now(), LocalDate.now().plusDays(10), ChronoUnit.DAYS, 1);
- *     Stream<TemporalRange<LocalDate>> splitRanges = dateRange.split(); //each range represents a day, from now to 10 days from now
+ * Example usage: <pre>{@code
+ * TemporalRange<LocalDate> dateRange = Ranges.temporalRange(LocalDate.now(), LocalDate.now().plusDays(10), ChronoUnit.DAYS, 1);
+ * Stream<TemporalRange<LocalDate>> splitRanges = dateRange.split(); //each range represents a day, from now to 10 days from now
  *
- *     TemporalRange<LocalDateTime> dateTimeRange = Ranges.temporalRange(LocalDateTime.now(), LocalDateTime.now().plusHours(10), ChronoUnit.HOURS, 1);
- *     TemporalRange<LocalTime> timeRange = Ranges.temporalRange(LocalTime.now(), LocalTime.now().plusMinutes(30), ChronoUnit.MINUTES, 5);
- *     TemporalRange<ZonedDateTime> zonedDateTimeRange = Ranges.temporalRange(ZonedDateTime.now(), ZonedDateTime.now().plusDays(5), ChronoUnit.DAYS, 1);
- *}
+ * TemporalRange<LocalDateTime> dateTimeRange = Ranges.temporalRange(LocalDateTime.now(), LocalDateTime.now().plusHours(10), ChronoUnit.HOURS, 1);
+ * TemporalRange<LocalTime> timeRange = Ranges.temporalRange(LocalTime.now(), LocalTime.now().plusMinutes(30), ChronoUnit.MINUTES, 5);
+ * TemporalRange<ZonedDateTime> zonedDateTimeRange = Ranges.temporalRange(ZonedDateTime.now(), ZonedDateTime.now().plusDays(5), ChronoUnit.DAYS, 1);
+ * }</pre>
  * </p>
  *
  * @param <T> A temporal and comparable type
  * @see Range
- * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)">Range (mathematics) on Wikipedia</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Interval_(mathematics)#Definitions_and_terminology">Interval (mathematics) - Definitions and terminoloagy on Wikipedia</a>
  */
 public interface TemporalRange<T extends Temporal & Comparable<? super T>> extends Range<T> {
     /**
@@ -34,7 +33,7 @@ public interface TemporalRange<T extends Temporal & Comparable<? super T>> exten
      * each representing 3 days plus a range for the remaining day.
      *
      * @return a stream of temporal ranges resulting from the split
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Splitting_ranges">Splitting ranges on Wikipedia</a>
      */
+    @SuppressWarnings("GrazieInspection")
     Stream<TemporalRange<T>> split();
 }
