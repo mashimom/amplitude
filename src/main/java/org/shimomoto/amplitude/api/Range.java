@@ -18,12 +18,11 @@ import java.util.Optional;
  * between the boundaries.
  * </p>
  * <p>
- * Example usage:
- * {@snippet :
+ * Example usage: <pre>{@code
  *     Range<Integer> range = new BaseRange<>(1, 10);
  *     boolean contains = range.containsValue(5);
  *     boolean isEmpty = range.isEmpty();
- *}
+ *}</pre>
  * </p>
  *
  * @author Marco Shimomoto
@@ -36,7 +35,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      * It is the smallest value within the closed-open range.
      *
      * @return the minimum value of the range
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Minimum_and_maximum">Minimum and maximum on Wikipedia</a>
      */
     T min();
 
@@ -45,7 +43,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      * It is the first highest value outside the range.
      *
      * @return the maximum value of the range
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Minimum_and_maximum">Minimum and maximum on Wikipedia</a>
      */
     T max();
 
@@ -55,7 +52,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      * E.g: [1, 1) is an empty range.
      *
      * @return true if the range is empty, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Empty_range">Empty range on Wikipedia</a>
      */
     boolean isEmpty();
 
@@ -67,7 +63,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param value the value to check
      * @return true if the value is within the range, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)">Range (mathematics) on Wikipedia</a>
      */
     boolean containsValue(@NotNull T value);
 
@@ -78,7 +73,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param range the range to check for disjointness
      * @return true if the ranges are disjoint, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Interval_(mathematics)#Disjoint_intervals">Disjoint intervals on Wikipedia</a>
      */
     boolean isDisjoint(@NotNull Range<T> range);
 
@@ -89,7 +83,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param range the range to check for touching
      * @return true if the ranges are touching, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Touching_intervals">Touching intervals on Wikipedia</a>
      */
     boolean isTouching(@NotNull Range<T> range);
 
@@ -100,7 +93,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param range the range to check for overlapping
      * @return true if the ranges overlap, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Interval_(mathematics)#Overlapping_intervals">Overlapping intervals on Wikipedia</a>
      */
     boolean isOverlapping(@NotNull Range<T> range);
 
@@ -112,7 +104,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param range the range to check against
      * @return true if this range is a subset or equal to the specified range, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Subset">Subset on Wikipedia</a>
      */
     boolean isSubsetOrEqualTo(@NotNull Range<T> range);
 
@@ -125,7 +116,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param range the range to check against
      * @return true if this range is a proper subset of the specified range, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Subset">Subset on Wikipedia</a>
      */
     boolean isProperSubsetOf(@NotNull Range<T> range);
 
@@ -136,7 +126,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param range the range to check against
      * @return true if this range is a superset of the specified range, false otherwise
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Superset">Superset on Wikipedia</a>
      */
     boolean isSuperSetOf(@NotNull Range<T> range);
 
@@ -148,7 +137,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param limit the value at which to split the range
      * @return a list of two ranges resulting from the split
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Splitting_ranges">Splitting ranges on Wikipedia</a>
      */
     List<Range<T>> splitAt(@NotNull T limit);
 
@@ -162,7 +150,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param other the range to combine with
      * @return a list of ranges resulting from the union
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Union">Union on Wikipedia</a>
      */
     List<Range<T>> union(@NotNull Range<T> other);
 
@@ -174,7 +161,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param other the range to intersect with
      * @return an Optional containing the intersection range, or an empty Optional if the ranges do not intersect
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Intersection">Intersection on Wikipedia</a>
      */
     Optional<Range<T>> intersection(@NotNull Range<T> other);
 
@@ -186,7 +172,6 @@ public interface Range<T extends Comparable<? super T>> extends Comparable<Range
      *
      * @param other the range to subtract from this range
      * @return a list of ranges resulting from the difference
-     * @see <a href="https://en.wikipedia.org/wiki/Range_(mathematics)#Difference">Difference on Wikipedia</a>
      */
     List<Range<T>> difference(@NotNull Range<T> other);
 }

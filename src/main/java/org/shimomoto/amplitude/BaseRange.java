@@ -18,7 +18,7 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
      * @param b second value
      * @return the maximum value between a and b
      */
-    private T getMaxBetween(T a, T b) {
+    private T getMaxBetween(final T a, final T b) {
         return a.compareTo(b) > 0 ? a : b;
     }
 
@@ -27,7 +27,7 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
      * @param b second value
      * @return the minimum value between a and b
      */
-    private T getMinBetween(T a, T b) {
+    private T getMinBetween(final T a, final T b) {
         return a.compareTo(b) < 0 ? a : b;
     }
 
@@ -37,43 +37,43 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
     }
 
     @Override
-    public boolean containsValue(@NotNull T value) {
+    public boolean containsValue(@NotNull final T value) {
         return min.compareTo(value) <= 0 && value.compareTo(max) < 0;
     }
 
     @Override
-    public boolean isDisjoint(@NotNull Range<T> range) {
+    public boolean isDisjoint(@NotNull final Range<T> range) {
         return max.compareTo(range.min()) <= 0 || range.max().compareTo(min) <= 0;
     }
 
     @Override
-    public boolean isTouching(@NotNull Range<T> range) {
+    public boolean isTouching(@NotNull final Range<T> range) {
         return max.equals(range.min()) || range.max().equals(min);
     }
 
     @Override
-    public boolean isOverlapping(@NotNull Range<T> range) {
+    public boolean isOverlapping(@NotNull final Range<T> range) {
         return min.compareTo(range.max()) < 0 && range.min().compareTo(max) < 0;
     }
 
     @Override
-    public boolean isSubsetOrEqualTo(@NotNull Range<T> range) {
+    public boolean isSubsetOrEqualTo(@NotNull final Range<T> range) {
         return range.min().compareTo(min) <= 0 && max.compareTo(range.max()) <= 0;
     }
 
     @Override
-    public boolean isProperSubsetOf(@NotNull Range<T> range) {
+    public boolean isProperSubsetOf(@NotNull final Range<T> range) {
         return range.min().compareTo(min) < 0 && max.compareTo(range.max()) <= 0
                 || range.min().compareTo(min) <= 0 && max.compareTo(range.max()) < 0;
     }
 
     @Override
-    public boolean isSuperSetOf(@NotNull Range<T> range) {
+    public boolean isSuperSetOf(@NotNull final Range<T> range) {
         return min.compareTo(range.min()) <= 0 && max.compareTo(range.max()) >= 0;
     }
 
     @Override
-    public List<Range<T>> splitAt(@NotNull T limit) {
+    public List<Range<T>> splitAt(@NotNull final T limit) {
         if (containsValue(limit)) {
             return List.of(new BaseRange<>(min, limit), new BaseRange<>(limit, max));
         }
@@ -81,7 +81,7 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
     }
 
     @Override
-    public List<Range<T>> union(@NotNull Range<T> other) {
+    public List<Range<T>> union(@NotNull final Range<T> other) {
         if (this.equals(other)) {
             return List.of(this);
         }
@@ -92,7 +92,7 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
     }
 
     @Override
-    public Optional<Range<T>> intersection(@NotNull Range<T> other) {
+    public Optional<Range<T>> intersection(@NotNull final Range<T> other) {
         if (this.isOverlapping(other)) {
             return Optional.of(new BaseRange<>(getMaxBetween(min, other.min()), getMinBetween(max, other.max())));
         }
@@ -100,7 +100,7 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
     }
 
     @Override
-    public List<Range<T>> difference(@NotNull Range<T> other) {
+    public List<Range<T>> difference(@NotNull final Range<T> other) {
         if (this.equals(other) || other.isSuperSetOf(this)) {
             return List.of();
         } else if (this.isSuperSetOf(other)) {
@@ -119,8 +119,8 @@ record BaseRange<T extends Comparable<? super T>>(T min, T max) implements Range
     }
 
     @Override
-    public int compareTo(Range<T> other) {
-        int minComparison = this.min.compareTo(other.min());
+    public int compareTo(final Range<T> other) {
+        final int minComparison = this.min.compareTo(other.min());
         if (minComparison != 0) {
             return minComparison;
         }

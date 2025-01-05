@@ -10,16 +10,15 @@ import java.time.temporal.UnsupportedTemporalTypeException;
 /**
  * Utility class for creating range instances.
  * <p>
- * This class provides static methods to create instances of {@link Range} and {@link TemporalRange}.
- * It includes methods to create ranges for comparable types and temporal types(with specific units and step size).
+ * This class provides static methods to create instances of {@link Range} and {@link TemporalRange}.</br>
+ * It includes methods to create ranges for comparable types and temporal types(with specific units and step size).</br>
  * The class is designed to be non-instantiable and throws {@link UnsupportedOperationException} if an attempt is made to instantiate it.
  * </p>
  * <p>
- * Example usage:
- * {@snippet :
- *     Range<Integer> intRange = Ranges.of(1, 10);
- *     TemporalRange<LocalDate> dateRange = Ranges.temporalRange(LocalDate.now(), LocalDate.now().plusDays(10), ChronoUnit.DAYS, 1);
- *}
+ * Example usage: <pre>{@code
+ * Range<Integer> intRange = Ranges.of(1, 10);
+ * TemporalRange<LocalDate> dateRange = Ranges.temporalRange(LocalDate.now(), LocalDate.now().plusDays(10), ChronoUnit.DAYS, 1);
+ * }</pre>
  * </p>
  *
  * @author Marco Shimomoto
@@ -45,7 +44,7 @@ public final class Ranges {
      * @throws IllegalArgumentException if min is greater than max
      * @see Range
      */
-    public static <T extends Comparable<? super T>> Range<T> of(T min, T max) {
+    public static <T extends Comparable<? super T>> Range<T> of(final T min, final T max) {
         if (min.compareTo(max) > 0) {
             throw new IllegalArgumentException(String.format("Inverted range is not accepted: min: %s, max: %s", min, max));
         }
@@ -65,9 +64,9 @@ public final class Ranges {
      * @throws UnsupportedTemporalTypeException if the unit is inadequate for the Temporal type
      * @see TemporalRange
      */
-    public static <T extends Temporal & Comparable<? super T>> TemporalRange<T> temporalRange(T min, T max, TemporalUnit unit, long step) {
+    public static <T extends Temporal & Comparable<? super T>> TemporalRange<T> temporalRange(final T min, final T max, final TemporalUnit unit, final long step) {
         // Throws exception if the unit is inadequate for the Temporal type, so it does not build invalid range
-        min.plus(1, unit);
+        min.plus(1, unit); //NOPMD: ignores UselessOperationOnImmutable
         return new TemporalRangeDecorator<>(of(min, max), unit, step);
     }
 }
