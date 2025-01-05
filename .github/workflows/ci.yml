@@ -47,7 +47,9 @@ jobs:
         run: ./gradlew assemble jar projectReport -Dorg.gradle.unsafe.configuration-cache=false -Dorg.gradle.daemon=false
 
       - name: Running all checks
-        run: ./gradlew check -Dorg.gradle.unsafe.configuration-cache=false -Dorg.gradle.daemon=false
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: ./gradlew check dependencyCheckAnalyze -Dorg.gradle.unsafe.configuration-cache=false -Dorg.gradle.daemon=false
 
       - name: Zip test reports
         if: startsWith(github.ref, 'refs/tags/v')

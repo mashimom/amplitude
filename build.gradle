@@ -5,6 +5,7 @@ plugins {
     id 'jacoco'
     id 'java-library'
     id 'org.ajoberstar.grgit' version '5.0.0-rc.3'
+    id 'org.owasp.dependencycheck' version '11.1.1'
     id 'project-report'
 }
 defaultTasks 'clean', 'assemble', 'projectReport', 'jar', 'check'
@@ -96,4 +97,19 @@ tasks.javadoc {
         charSet = 'UTF-8'
         links 'https://docs.oracle.com/en/java/javase/21/docs/api/'
     }
+}
+
+dependencyCheck {
+    analyzers {
+        nvd {
+            apiKey = project.hasProperty('nvdApiKey') ? project.nvdApiKey : System.getenv('NVD_API_KEY')
+        }
+    }
+
+    // Optional: Configure other settings
+    failBuildOnCVSS = 7  // Optional: Fail build if any CVE has a CVSS score greater than or equal to 7
+//    suppressionFile = 'dependency-check-suppression.xml'  // Optional: Suppression file for known issues
+//    formats = ['HTML', 'XML', 'JSON']  // Output formats
+//    outputDirectory = 'build/reports/dependency-check'  // Location to save reports
+
 }
